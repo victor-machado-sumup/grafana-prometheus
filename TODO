@@ -5,26 +5,37 @@
         2. http://localhost:3000 para acessar o Grafana local, admin:admin
         3. http://localhost:3000/connections/datasources para configurar o Prometheus data source, insira http://prometheus:9090 no Prometheus server URL
     - Start app single:
-        1. docker-compose up -d app
+        - docker-compose up -d app
     - Página de métricas http://localhost:8080/metrics
     - Metrics explorer http://localhost:3000/explore
 [ ] Metodo de coleta Pushgateway
     - Stop app single:
-        docker-compose down app
+        - docker-compose down app
     - Start pushgateway:
-        docker-compose up -d pushgateway
+       - docker-compose up -d pushgateway
     - Página de métricas http://localhost:9091/metrics
     - Start job:
-        docker-compose up -d job
+        - docker-compose up -d job
 [ ] Criando métricas no código
     - Stop job:
-        docker-compose down job pushgateway
+        - docker-compose down job pushgateway
     - Tipos de métricas:
-        1. Counter
-            Exemplos: qtd de requisições, qtd de transações bem sucedidas
-        2. Gauge
-            Exemplos: uso de memória, saldo atual de uma conta
-    - promauto
+        1. Referência: https://prometheus.io/docs/concepts/metric_types/
+        2. Counter:
+            - Explicar métrica
+            - Criar métrica de Counter pra contar os pagamentos bem sucedidos
+            - docker-compose up -d --build app
+            - Metrics explorer http://localhost:3000/explore
+        3. Gauge
+            - Explicar métrica
+            - Criar métrica de Gague pra contar o Balance atual
+            - docker-compose up -d --build app
+            - Metrics explorer http://localhost:3000/explore
+        4. Histogram
+            - Explicar métrica
+            - Criar métrica de Histogram pra registrar os valores de pagamento
+            - docker-compose up -d --build app
+            - Metrics explorer http://localhost:3000/explore
 [ ] Labels de plataforma (pod, app, container, etc)
 [ ] Labels customizadas
 [ ] PromQL e Dashboards

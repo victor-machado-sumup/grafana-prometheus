@@ -9,6 +9,7 @@ services:
       - "8080"
     depends_on:
       - grafana
+      - postgres
 
   app1:
     build: .
@@ -18,6 +19,7 @@ services:
       - "8081"
     depends_on:
       - grafana
+      - postgres
 
   app2:
     build: .
@@ -27,6 +29,7 @@ services:
       - "8082"
     depends_on:
       - grafana
+      - postgres
 
   app3:
     build: .
@@ -36,6 +39,7 @@ services:
       - "8083"
     depends_on:
       - grafana
+      - postgres
 
   nginx:
     image: nginx:latest
@@ -96,6 +100,21 @@ services:
       - pushgateway
     restart: unless-stopped
 
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: payments
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgres
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
 volumes:
   prometheus_data:
   grafana_data:
+  postgres_data:

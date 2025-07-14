@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "app-single"
+    static_configs:
+      - targets: ["app:8080"]
+        labels:
+          app: "app-single"
+          pod: "app-single"
+
+  - job_name: "app-loadbalancer"
+    static_configs:
+      - targets: ["app1:8081"]
+        labels:
+          app: "app"
+          pod: "app1"
+      - targets: ["app2:8082"]
+        labels:
+          app: "app"
+          pod: "app2"
+      - targets: ["app3:8083"]
+        labels:
+          app: "app"
+          pod: "app3"
+
+  - job_name: "pushgateway"
+    honor_labels: true
+    static_configs:
+      - targets: ["pushgateway:9091"]

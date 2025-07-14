@@ -1,0 +1,30 @@
+[ ] Apresentar Dashboard Exemplo https://grafana.sam-app.ro/d/aeq4vbdn9g7pca/metrics-example?orgId=1&var-min_step=5m&from=now-6h&to=now
+[ ] Metodo de coleta Scraping
+    - Setup Grafana:
+        1. docker-compose up -d grafana
+        2. http://localhost:3000 para acessar o Grafana local, admin:admin
+        3. http://localhost:3000/connections/datasources para configurar o Prometheus data source, insira http://prometheus:9090 no Prometheus server URL
+    - Start app single:
+        1. docker-compose up -d app
+    - Página de métricas http://localhost:8080/metrics
+    - Metrics explorer http://localhost:3000/explore
+[ ] Metodo de coleta Pushgateway
+    - Stop app single:
+        docker-compose down app
+    - Start pushgateway:
+        docker-compose up -d pushgateway
+    - Página de métricas http://localhost:9091/metrics
+    - Start job:
+        docker-compose up -d job
+[ ] Criando métricas no código
+    - Stop job:
+        docker-compose down job pushgateway
+    - Tipos de métricas:
+        1. Counter
+            Exemplos: qtd de requisições, qtd de transações bem sucedidas
+        2. Gauge
+            Exemplos: uso de memória, saldo atual de uma conta
+    - promauto
+[ ] Labels de plataforma (pod, app, container, etc)
+[ ] Labels customizadas
+[ ] PromQL e Dashboards

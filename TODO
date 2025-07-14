@@ -1,41 +1,67 @@
 [ ] Apresentar Dashboard Exemplo https://grafana.sam-app.ro/d/aeq4vbdn9g7pca/metrics-example?orgId=1&var-min_step=5m&from=now-6h&to=now
 [ ] Metodo de coleta Scraping
-    - Setup Grafana:
+    - Configurar Grafana local:
         1. docker-compose up -d grafana
         2. http://localhost:3000 para acessar o Grafana local, admin:admin
         3. http://localhost:3000/connections/datasources para configurar o Prometheus data source, insira http://prometheus:9090 no Prometheus server URL
-    - Start app single:
+    - Iniciar app:
         - docker-compose up -d app
     - Página de métricas http://localhost:8080/metrics
     - Metrics explorer http://localhost:3000/explore
 [ ] Metodo de coleta Pushgateway
-    - Stop app single:
+    - Parar app:
         - docker-compose down app
-    - Start pushgateway:
+    - Iniciar pushgateway:
        - docker-compose up -d pushgateway
     - Página de métricas http://localhost:9091/metrics
-    - Start job:
+    - Iniciar job:
         - docker-compose up -d job
 [ ] Criando métricas no código
-    - Stop job:
+    - Parar job:
         - docker-compose down job pushgateway
+    - Iniciar app:
+        - docker-compose up -d app
+    - Explicando o app:
+        - fazer algumas requisições
+        - Rodar queries: docker exec -it postgres psql -U postgres -d payments -c "SELECT * FROM payments;"
     - Tipos de métricas:
         1. Referência: https://prometheus.io/docs/concepts/metric_types/
         2. Counter:
-            - Explicar métrica
             - Criar métrica de Counter pra contar os pagamentos bem sucedidos
-            - docker-compose up -d --build app
+            - Reiniciar app: docker-compose up -d --build app
             - Metrics explorer http://localhost:3000/explore
         3. Gauge
-            - Explicar métrica
             - Criar métrica de Gague pra contar o Balance atual
-            - docker-compose up -d --build app
+            - Reiniciar app: docker-compose up -d --build app
             - Metrics explorer http://localhost:3000/explore
         4. Histogram
-            - Explicar métrica
             - Criar métrica de Histogram pra registrar os valores de pagamento
-            - docker-compose up -d --build app
+            - Reiniciar app: docker-compose up -d --build app
             - Metrics explorer http://localhost:3000/explore
 [ ] Labels de plataforma (pod, app, container, etc)
+    - Parar app:
+        - docker-compose down app
+    - Limpar os dados:
+        - docker-compose down -v prometheus
+        - docker-compose up -d grafana
+        - Verificar se as métricas estão vazias http://localhost:3000/explore
+    - Iniciar nginx:
+        - docker-compose up -d nginx
+        - Fazer alguns requests
+        - Metrics explorer http://localhost:3000/explore
 [ ] Labels customizadas
+    - Stop app:
+        - docker-compose down nginx
+    - Adicionar label de metodo de pagamento no counter
+    - Reiniciar nginx: docker-compose up -d --build ngnix
 [ ] PromQL e Dashboards
+    - Criando um Dashboard
+    - Visualização de Counter
+    - Visualização de Counter por app
+    - Visualização de Counter filtrado pelo app1
+    - Visualização da função Increase
+[ ] PromQL e Alertas
+    - Referência https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+    - Entendendo os campos expr, for, keep_firing_for, labels e annotations
+    - Criando um alerta e verificando no MailHog http://localhost:8025/
+    - Onde definir alertas na SumUp https://github.com/sumup/deploy-infra/blob/master/projects/monitoring/prometheus-rules/rules

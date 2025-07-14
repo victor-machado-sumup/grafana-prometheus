@@ -1,0 +1,35 @@
+### Credit Card Payment
+POST http://localhost:8080/payment
+Content-Type: application/json
+
+{
+    "value": 100.50,
+    "method": "credit"
+}
+
+### Debit Card Payment
+POST http://localhost:8080/payment
+Content-Type: application/json
+
+{
+    "value": 10.00,
+    "method": "debit"
+}
+
+### Boleto Payment
+POST http://localhost:8080/payment
+Content-Type: application/json
+
+{
+    "value": 2570.00,
+    "method": "boleto"
+}
+
+### PIX Payment
+POST http://localhost:8080/payment
+Content-Type: application/json
+
+{
+    "value": 7890.90,
+    "method": "pix"
+}

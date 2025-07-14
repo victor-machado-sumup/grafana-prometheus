@@ -6,10 +6,8 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -17,46 +15,6 @@ var (
 	port = flag.String("port", "8080", "Port to listen on")
 	app  = flag.String("app", "go-app", "Go app name")
 )
-
-type PaymentRepository struct {
-	pool *pgxpool.Pool
-}
-
-func NewPaymentRepository(pool *pgxpool.Pool) *PaymentRepository {
-	return &PaymentRepository{pool: pool}
-}
-
-func (r *PaymentRepository) SavePayment(ctx context.Context, value float64, appName string) error {
-	_, err := r.pool.Exec(ctx,
-		"INSERT INTO payments (value, app_name) VALUES ($1, $2)",
-		value, appName)
-	return err
-}
-
-func waitForDB(ctx context.Context, dsn string, maxAttempts int) (*pgxpool.Pool, error) {
-	var dbpool *pgxpool.Pool
-	var err error
-
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		log.Printf("Attempting to connect to PostgreSQL (attempt %d/%d)...", attempt, maxAttempts)
-
-		dbpool, err = pgxpool.New(ctx, dsn)
-		if err == nil {
-			// Try to ping the database
-			if err = dbpool.Ping(ctx); err == nil {
-				log.Println("Successfully connected to PostgreSQL")
-				return dbpool, nil
-			}
-		}
-
-		if attempt < maxAttempts {
-			log.Printf("Failed to connect: %v. Retrying in 5 seconds...", err)
-			time.Sleep(5 * time.Second)
-		}
-	}
-
-	return nil, err
-}
 
 func main() {
 	flag.Parse()
@@ -76,7 +34,8 @@ func main() {
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	type PaymentPayload struct {
-		Value float64 `json:"value"`
+		Value  float64       `json:"value"`
+		Method PaymentMethod `json:"method"`
 	}
 
 	r.POST("/payment", func(c *gin.Context) {
@@ -86,6 +45,13 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "Invalid request body",
 				"error":   err.Error(),
+			})
+			return
+		}
+
+		if !IsValidPaymentMethod(payload.Method) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Invalid payment method",
 			})
 			return
 		}
@@ -101,7 +67,7 @@ func main() {
 		}
 
 		// Save payment to database
-		err := paymentRepo.SavePayment(c.Request.Context(), payload.Value, *app)
+		err := paymentRepo.SavePayment(c.Request.Context(), payload.Value, payload.Method, *app)
 		if err != nil {
 			log.Printf("Error saving payment: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -115,6 +81,7 @@ func main() {
 			"message": "Payment processed successfully",
 			"app":     *app,
 			"value":   payload.Value,
+			"method":  payload.Method,
 		})
 	})
 
